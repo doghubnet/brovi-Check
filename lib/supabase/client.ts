@@ -1,9 +1,8 @@
 "use client";
 
-import { createBrowserClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { env } from '../env';
 
-export const supabase = createBrowserClient(
-  env.public.supabaseUrl,
-  env.public.supabaseAnonKey
-);
+export const supabase: SupabaseClient | null = env.flags.hasSupabaseClient
+  ? createClient(env.public.supabaseUrl, env.public.supabaseAnonKey)
+  : null;

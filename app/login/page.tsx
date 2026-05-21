@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+import { env } from '../../lib/env';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,15 +32,14 @@ export default function LoginPage() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const supabase = env.flags.hasSupabaseClient ? createClient(env.public.supabaseUrl, env.public.supabaseAnonKey) : null;
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setMessage('');
     try {
+      if (!supabase) { setMessage('Supabase auth is not configured yet.'); setLoading(false); return; }
       const { data, error } = await supabase.auth.signInWithPassword({ email: signInEmail.trim(), password: signInPassword });
       if (error || !data.session) {
         setMessage(error?.message || 'Unable to sign in');
@@ -81,6 +81,7 @@ export default function LoginPage() {
       return;
     }
     try {
+      if (!supabase) { setMessage('Supabase auth is not configured yet.'); setLoading(false); return; }
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -113,6 +114,7 @@ export default function LoginPage() {
       const redirectTo = process.env.NEXT_PUBLIC_SITE_URL
         ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
         : `${window.location.origin}/auth/callback`;
+      if (!supabase) { setMessage('Supabase auth is not configured yet.'); setLoading(false); return; }
       const { error } = await supabase.auth.signInWithOtp({
         email: magicEmail.trim(),
         options: { emailRedirectTo: redirectTo },
@@ -134,6 +136,7 @@ export default function LoginPage() {
       const redirectTo = process.env.NEXT_PUBLIC_SITE_URL
         ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
         : `${window.location.origin}/auth/callback`;
+      if (!supabase) { setMessage('Supabase auth is not configured yet.'); return; }
       await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
     } catch {
       // ignore
