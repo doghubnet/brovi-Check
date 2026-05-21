@@ -23,7 +23,10 @@ export default function ChatWidget() {
   async function sendMessage() {
     const trimmed = input.trim();
     if (!trimmed) return;
-    const newMessages = [...messages, { role: 'user', content: trimmed }];
+
+    const userMessage: ChatMessage = { role: 'user', content: trimmed };
+    const newMessages: ChatMessage[] = [...messages, userMessage];
+
     setMessages(newMessages);
     setInput('');
     setLoading(true);
@@ -34,9 +37,14 @@ export default function ChatWidget() {
         body: JSON.stringify({ messages: newMessages }),
       });
       const data = await res.json();
-      setMessages([...newMessages, { role: 'assistant', content: data.message }]);
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: typeof data.message === 'string' ? data.message : 'I received your message, but no valid response was returned.',
+      };
+      setMessages([...newMessages, assistantMessage]);
     } catch {
-      setMessages([...newMessages, { role: 'assistant', content: 'Sorry, something went wrong.' }]);
+      const errorMessage: ChatMessage = { role: 'assistant', content: 'Sorry, something went wrong.' };
+      setMessages([...newMessages, errorMessage]);
     } finally {
       setLoading(false);
     }
