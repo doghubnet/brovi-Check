@@ -1,15 +1,9 @@
 "use client";
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
-/**
- * Handles the OAuth callback. After Supabase processes the provider
- * token it will set the session cookie. This page waits for the
- * session and then redirects the user to the `next` parameter or
- * the dashboard.
- */
-export default function AuthCallbackPage() {
+function AuthCallbackInner() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -24,5 +18,14 @@ export default function AuthCallbackPage() {
     }
     finish();
   }, [router, params]);
+
   return <p className="py-10 text-center">Signing you in…</p>;
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<p className="py-10 text-center">Signing you in…</p>}>
+      <AuthCallbackInner />
+    </Suspense>
+  );
 }

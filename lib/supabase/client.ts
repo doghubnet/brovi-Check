@@ -1,9 +1,9 @@
 "use client";
 
-import { createBrowserClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { env } from '../env';
 
-export const supabase = createBrowserClient(
+export const supabase = createClient(
   env.public.supabaseUrl,
   env.public.supabaseAnonKey
 );
