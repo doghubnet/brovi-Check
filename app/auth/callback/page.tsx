@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
@@ -9,7 +9,7 @@ import { createClient } from '@supabase/supabase-js';
  * session and then redirects the user to the `next` parameter or
  * the dashboard.
  */
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -24,5 +24,14 @@ export default function AuthCallbackPage() {
     }
     finish();
   }, [router, params]);
+
   return <p className="py-10 text-center">Signing you in…</p>;
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<p className="py-10 text-center">Signing you in…</p>}>
+      <AuthCallbackContent />
+    </Suspense>
+  );
 }
