@@ -1,10 +1,10 @@
 "use client";
 import { useState } from 'react';
 
-interface ChatMessage {
+type ChatMessage = {
   role: 'user' | 'assistant';
   content: string;
-}
+};
 
 /**
  * A floating chat widget that allows users to have simple conversations
@@ -23,7 +23,8 @@ export default function ChatWidget() {
   async function sendMessage() {
     const trimmed = input.trim();
     if (!trimmed) return;
-    const newMessages = [...messages, { role: 'user', content: trimmed }];
+    const userMessage: ChatMessage = { role: 'user', content: trimmed };
+    const newMessages: ChatMessage[] = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
     setLoading(true);
